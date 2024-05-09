@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image, ScrollView} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image, ScrollView,Button} from 'react-native';
 import MenuDrawer from 'react-native-side-drawer';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Usuario extends Component {
   constructor(props) {
@@ -16,6 +16,21 @@ export default class Usuario extends Component {
 toggleOpen = () => {
   this.setState({ open: !this.state.open });
 };
+componentDidMount=async()=>{
+  const value = await AsyncStorage.getItem('login');
+  try {
+   
+    if (value !== null) {
+      // value previously stored
+    }else{
+      this.props.navigation.navigate("INICIO");
+    }
+  } catch (e) {
+    // error reading value
+    this.props.navigation.navigate("INICIO");
+  }
+
+}
 getGreeting() {
   const currentHour = new Date().getHours();
   if (currentHour >= 5 && currentHour < 13) {
@@ -26,11 +41,35 @@ getGreeting() {
     return "Buenas noches";
   }
 }
+getData = async () => {
+  try {
+    const value = await AsyncStorage.getItem('login');
+    if (value !== null) {
+      // value previously stored
+    }
+  } catch (e) {
+    // error reading value
+  }
+};
+cerrarSesion=async()=>{
+  try {
+    await AsyncStorage.removeItem('login')
+  } catch(e) {
+    // remove error
+  }
+
+  console.log('Done.')
+  this.props.navigation.navigate('INICIO')
+}
+
 drawerContent = () => {
   return (
     
     <View style={styles.animatedBox}>
-    <Text stlye={{color:'black'}}>Bienvenido {this.props.route.params.nombre}</Text>
+    <Text stlye={{color:'black'}}>Bienvenido</Text>
+    <View>
+      <Button title="deslogueo"onPress={this.cerrarSesion}></Button>
+    </View>
     <TouchableOpacity onPress={this.toggleOpen} >
     
        <Text>Close </Text> 
@@ -62,7 +101,7 @@ drawerContent = () => {
           <View style={{flex: 1}}>
           <View style={{flex: 1}}>
 
-          <Text style={{color:'#560000', fontSize:50}}>{this.getGreeting()} {this.props.route.params.nombre}</Text>
+          <Text style={{color:'#560000', fontSize:50}}>{this.getGreeting()} </Text>
         </View>
         <View style={{flex: 1,marginTop:-550}}>
   <ScrollView>

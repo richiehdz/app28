@@ -6,7 +6,9 @@ import { View, Text, ImageBackground, Alert } from 'react-native';
 // import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 //import icon from 'react-native-vector-icons/MaterialCommunityIcons';
 //import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Usuario from './Usuario';
+
 // import Usuario from './ManejoTabs';
 //checar que 'Usuario' sea el correcto
 export default class Login extends Component {
@@ -19,12 +21,13 @@ export default class Login extends Component {
     correoRegistar:'',
     passwordRegistrar:'',
     nombreRegistar:'',
+    confirmPasswordRegistrar:'',
     };
   }
 //El boton de Entrar ponerlo solo cuando se vean los campos del login y ocultarlo cuando se vean los campos de Alta
 //El '1', '2' o '3' del xhttp son del SCRIPT no del estado de 'siono'
 
-//crear tabla 'datos' con 4 elementos, id int10 se comparte con los ids creados en la otra tabla, nombre varchar70, direccion varchar70 y telefono varchar12
+//crear tabla 'datos' con 4 elementos, id int10 se comparte con los ids creados en la otra tabla, nombre varchar70, correo varchar70 y password varchar12
   render() {
     const login= () =>{
       console.log("login");
@@ -33,21 +36,68 @@ export default class Login extends Component {
     const alta = () =>{
         this.setState({siono:2});
     }
-    const registrar = () =>{
-      this.setState({siono:10});
-      
-  }
-  const Entrar=()=>{
+    registrar = () => {
+      const { nombreRegistar, correoRegistar, passwordRegistrar, confirmPasswordRegistrar } = this.state;
+    
+      // Validar la entrada
+      if (nombreRegistar.length > 70 || correoRegistar.length > 70 || passwordRegistrar.length > 70) {
+        Alert.alert("La longitud de la entrada no debe exceder los 70 caracteres.");
+      } else if (passwordRegistrar !== confirmPasswordRegistrar) {
+        Alert.alert("Las contraseñas no coinciden.");
+      } else {
+        // Configurar la solicitud
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "https://equisdedez.000webhostapp.com/register.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+        // Manejar la respuesta
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            switch(xhr.responseText) {
+              case '11':
+                Alert.alert('Registro exitoso.');
+                login();
+                
+                break;
+              case '12':
+                Alert.alert('Las contraseñas no coinciden.');
+                break;
+              case '13':
+                Alert.alert('El correo ya está registrado en la base de datos.');
+                break;
+              default:
+                Alert.alert('Error desconocido: ' + xhr.responseText);
+            }
+          } else {
+            Alert.alert("Error: " + xhr.statusText);
+          }
+        };
+    
+        // Enviar la solicitud
+        var data = `nombreRegistar=${encodeURIComponent(nombreRegistar)}&correoRegistar=${encodeURIComponent(correoRegistar)}&passwordRegistrar=${encodeURIComponent(passwordRegistrar)}`;
+        xhr.send(data);
+      }
+    }
+    
+    
+    
+    
+  const Entrar=async()=>{
     let _this=this;
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange=function(){
+    xhttp.onreadystatechange=async function(){
       console.log("entrar");
       if(this.readyState==4 && this.status==200){
         var response = JSON.parse(xhttp.responseText);
         if(response.status === "1"){
           console.log("entro");
           // Navega a la siguiente pantalla y pasa el nombre del usuario
-          _this.props.navigation.navigate("USUARIO", { nombre: response.nombre });
+          _this.props.navigation.navigate("USUARIO");
+          try {
+            await AsyncStorage.setItem('login', xhttp.responseText);
+          } catch (e) {
+            // saving error
+          }
         }
         if(xhttp.responseText==="0"){
           //mal password
@@ -190,7 +240,7 @@ Entrar
     <Input style={{color:'white'}}
     placeholder='Correo'
     placeholderTextColor='white'
-    onChangeText={var1=>this.setState({correoRegistrar:var1})}
+    onChangeText={var1=>this.setState({correoRegistar:var1})}
     leftIcon={{type:'font-awesome',name:'envelope',color:'white'}}
     >
     </Input>
@@ -199,7 +249,7 @@ Entrar
     placeholder='Password'
     
     placeholderTextColor='white'
-    onChangeText={var1=>this.setState({passwordConfirm:var1})}
+    onChangeText={var1=>this.setState({passwordRegistrar:var1})}
     leftIcon={{type:'font-awesome',name:'lock',color:'white'}}
     >
     </Input>
@@ -207,7 +257,7 @@ Entrar
     placeholder='Confirm password'
     
     placeholderTextColor='white'
-    onChangeText={var1=>this.setState({passwordRegistrar:var1})}
+    onChangeText={var1=>this.setState({confirmPasswordRegistrar:var1})}
     leftIcon={{type:'font-awesome',name:'lock',color:'white'}}
     >
     </Input>

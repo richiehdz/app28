@@ -24,7 +24,7 @@ export default class ManejoTabs extends Component {
         tabBarInactiveTintColor:'black',
       }}
     >
-      <Tab.Screen name="Inicio" component={Usuario} initialParams={{nombre:this.props.route.params.nombre}} 
+      <Tab.Screen name="Inicio" component={Usuario} /*initialParams={{nombre:this.props.route.params.nombre}} */
       options={{
         
         headerShown:false,
@@ -34,14 +34,14 @@ export default class ManejoTabs extends Component {
       }}
       
       />
-      <Tab.Screen name="Videos" component={Usuario1} initialParams={{nombre:this.props.route.params.nombre}}
+      <Tab.Screen name="Videos" component={Usuario1} /*initialParams={{nombre:this.props.route.params.nombre}}*/
       options={{
         headerShown:false,
         tabBarIcon: ({ color, size }) => (
           <MaterialCommunityIcons name="youtube" color='red' size={size} />
         )
       }}/>
-      <Tab.Screen name="Musica" component={Usuario2} initialParams={{nombre:this.props.route.params.nombre}}
+      <Tab.Screen name="Musica" component={Usuario2} /*initialParams={{nombre:this.props.route.params.nombre}}*/
       options={{
         headerShown:false,
         tabBarIcon: ({ color, size }) => (

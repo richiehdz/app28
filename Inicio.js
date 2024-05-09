@@ -20,8 +20,9 @@ export default class Inicio extends Component {
     return (
       <NavigationContainer>
         <Stack.Navigator>
-        <Stack.Screen name="INICIO" component={Login} options={{headerShown:false}}/>
+        
         <Stack.Screen name='USUARIO' component={Usuario} options={{headerShown:false}}/>
+        <Stack.Screen name="INICIO" component={Login} options={{headerShown:false}}/>
         </Stack.Navigator>
       </NavigationContainer>
     );
